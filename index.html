@@ -545,8 +545,13 @@ footer{
       <li><a href="#skills">Skills</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <div class="nav-badge">Available for hire</div>
-  </div>
+      <div class="language-switcher">
+          <button type="button" class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+          <button type="button" class="lang-btn" onclick="changeLanguage('tr')">TR</button>
+          <button type="button" class="lang-btn" onclick="changeLanguage('ru')">RU</button>
+      </div>
+      <div class="nav-badge">Available for hire</div>
+    </div>
 </nav>
 
 <section class="hero">
@@ -895,6 +900,83 @@ document.querySelectorAll('a,button').forEach(el=>{
     ring.style.borderColor='rgba(201,168,76,0.4)';
   });
 });
+</script>
+  <script>
+// 1. Dil Sözlüğü (İçerikleri buraya ekledik)
+const translations = {
+    en: {
+        namePlaceholder: "Your name",
+        emailPlaceholder: "Your email",
+        subjectPlaceholder: "Project type (Bot / API / Scraping...)",
+        messagePlaceholder: "Tell me about your project...",
+        sendButton: "Send Message →",
+        successMsg: "I've received your message, I'll get back to you soon."
+    },
+    tr: {
+        namePlaceholder: "Adınız",
+        emailPlaceholder: "E-posta adresiniz",
+        subjectPlaceholder: "Proje türü (Bot / API / Scraping...)",
+        messagePlaceholder: "Projenizden bahsedin...",
+        sendButton: "Mesaj Gönder →",
+        successMsg: "Mesajınızı aldım, en kısa sürede döneceğim."
+    },
+    ru: {
+        namePlaceholder: "Ваше имя",
+        emailPlaceholder: "Ваш e-mail",
+        subjectPlaceholder: "Тип проекта (Бот / API / Скрапинг...)",
+        messagePlaceholder: "Расскажите о вашем проекте...",
+        sendButton: "Отправить сообщение →",
+        successMsg: "Я получил ваше сообщение, я скоро свяжусь с вами."
+    }
+};
+
+let currentLang = 'en';
+
+// 2. Dil Değiştirme Fonksiyonu
+function changeLanguage(lang) {
+    currentLang = lang;
+    
+    // Butonların aktiflik durumunu güncelle
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText.toLowerCase() === lang);
+    });
+
+    // Formdaki placeholder ve buton metinlerini güncelle
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = translations[lang][key];
+    });
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.innerText = translations[lang][key];
+    });
+}
+
+// 3. Formu Sayfa Yenilenmeden Gönderme (AJAX)
+const contactForm = document.getElementById('contact-form');
+const statusDiv = document.getElementById('form-status');
+
+if (contactForm) {
+    contactForm.onsubmit = async (e) => {
+        e.preventDefault();
+        statusDiv.innerText = "...";
+        
+        const data = new FormData(contactForm);
+        const response = await fetch(contactForm.action, {
+            method: contactForm.method,
+            body: data,
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            statusDiv.innerText = translations[currentLang].successMsg;
+            contactForm.reset();
+        } else {
+            statusDiv.innerText = "Error!";
+        }
+    };
+}
 </script>
 </body>
 </html>
